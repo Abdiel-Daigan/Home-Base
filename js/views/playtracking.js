@@ -7,8 +7,6 @@ import '../actions/playActions.js';
 
 let playTick = null;
 
-// The tag pool offered as chips in the add-game form.
-// Matches the mood picker's vocabulary so draws work.
 export const TAG_OPTIONS = [
   'cozy', 'relaxing', 'farming', 'casual',
   'intense', 'action', 'fast', 'competitive',
@@ -18,10 +16,9 @@ export const TAG_OPTIONS = [
   'brain-off', 'idle',
 ];
 
-// A single in-flight form state, reset after each add
 const formState = {
   tags: new Set(),
-  imageData: null,   // dataURL from the editor
+  imageData: null,
 };
 
 export function getFormState() { return formState; }
@@ -50,12 +47,10 @@ export function renderPlayTracking(root) {
     ${backButton()}
     <h2>⏱️ play tracking</h2>
 
-    <!-- ============ ADD GAME FORM ============ -->
     <div class="card">
       <h3 style="margin-bottom:0.8rem;">add a game</h3>
 
       <div class="row" style="align-items:flex-start;">
-        <!-- cover preview / upload -->
         <div class="cover-uploader" onclick="openImageEditor()" title="click to add cover">
           ${formState.imageData
             ? `<img src="${formState.imageData}" alt="cover">`
@@ -84,7 +79,6 @@ export function renderPlayTracking(root) {
       </div>
     </div>
 
-    <!-- ============ LIBRARY GRID ============ -->
     <div class="card">
       <h3>game library <span class="small-text">(${state.games.length})</span></h3>
       ${state.games.length === 0
@@ -105,7 +99,6 @@ export function renderPlayTracking(root) {
           </div>`}
     </div>
 
-    <!-- ============ NOW PLAYING ============ -->
     ${active ? `
       <div class="card" style="border-left:4px solid var(--accent);">
         <h3>now playing: ${escapeHTML(active.gameName)}</h3>
@@ -114,7 +107,6 @@ export function renderPlayTracking(root) {
       </div>
     ` : ''}
 
-    <!-- ============ RECENT SESSIONS ============ -->
     <div class="card">
       <h3>recent sessions</h3>
       ${state.playSessions.length === 0 ? '<div class="empty-msg">no sessions yet</div>' :
@@ -129,7 +121,6 @@ export function renderPlayTracking(root) {
         `).join('')}
     </div>
 
-    <!-- ============ TOTALS + BACKLOG ============ -->
     <div class="card">
       <h3>total minutes per game</h3>
       ${Object.keys(totalMinutes).length === 0 ? '<div class="empty-msg">no completed sessions yet</div>' :
@@ -145,7 +136,6 @@ export function renderPlayTracking(root) {
       <p>games played this month: <strong>${playedThisMonth.size}</strong></p>
     </div>
 
-    <!-- ============ FINISH IT LIST ============ -->
     <div class="card">
       <h3>finish it list</h3>
       ${state.finishList.length === 0 ? '<div class="empty-msg">nothing on your finish list</div>' :
@@ -161,14 +151,13 @@ export function renderPlayTracking(root) {
       </div>
     </div>
 
-    <!-- ============ IMAGE EDITOR MODAL ============ -->
     <div id="image-editor" class="modal-backdrop hidden">
       <div class="modal">
         <div class="modal-header">
           <h3>cover image</h3>
           <button class="dock-close" onclick="closeImageEditor()" aria-label="close">✕</button>
         </div>
-        <p class="small-text">choose an image, then drag to position and zoom. output is ${320}×${180}.</p>
+        <p class="small-text">choose an image, then drag to position and zoom. output is 320×180.</p>
         <input type="file" id="image-file" accept="image/*" onchange="loadEditorImage(event)">
         <div id="editor-stage" class="editor-stage">
           <canvas id="editor-canvas" width="320" height="180"></canvas>
@@ -199,7 +188,6 @@ export function renderPlayTracking(root) {
     }, 1000);
   }
 
-  // draw editor if an image was already loaded into it
   if (window._editorState?.image) {
     requestAnimationFrame(drawEditor);
   }
