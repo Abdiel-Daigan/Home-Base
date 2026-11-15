@@ -239,22 +239,26 @@ export function drawEditor() {
   ctx.restore();
 }
 
+// BUG FIX: Removed the dataset check so listeners are cleanly attached every time
 export function wireEditorDrag() {
   const canvas = document.getElementById('editor-canvas');
-  if (!canvas || canvas.dataset.dragWired) return;
-  canvas.dataset.dragWired = '1';
+  if (!canvas) return;
+  
+  // Create a fresh clone to strip old listeners, preventing duplicates
+  const newCanvas = canvas.cloneNode(true);
+  canvas.parentNode.replaceChild(newCanvas, canvas);
 
   const es = window._editorState;
   const start = (e) => {
     if (!es.image) return;
     es.dragging = true;
-    const p = pointerPos(canvas, e);
+    const p = pointerPos(newCanvas, e);
     es.lastX = p.x; es.lastY = p.y;
-    canvas.setPointerCapture?.(e.pointerId);
+    newCanvas.setPointerCapture?.(e.pointerId);
   };
   const move = (e) => {
     if (!es.dragging) return;
-    const p = pointerPos(canvas, e);
+    const p = pointerPos(newCanvas, e);
     const dx = p.x - es.lastX;
     const dy = p.y - es.lastY;
     es.offsetX += dx / es.zoom;
@@ -264,11 +268,11 @@ export function wireEditorDrag() {
   };
   const end = () => { es.dragging = false; };
 
-  canvas.addEventListener('pointerdown', start);
-  canvas.addEventListener('pointermove', move);
-  canvas.addEventListener('pointerup', end);
-  canvas.addEventListener('pointercancel', end);
-  canvas.addEventListener('pointerleave', end);
+  newCanvas.addEventListener('pointerdown', start);
+  newCanvas.addEventListener('pointermove', move);
+  newCanvas.addEventListener('pointerup', end);
+  newCanvas.addEventListener('pointercancel', end);
+  newCanvas.addEventListener('pointerleave', end);
 }
 
 function pointerPos(canvas, e) {
