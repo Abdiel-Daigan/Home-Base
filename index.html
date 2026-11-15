@@ -7,16 +7,16 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- Burger button (always visible, top-left) -->
+  <!-- Burger button (moves to sidebar top-right when open) -->
   <button id="burger-btn" class="burger-btn" aria-label="Toggle menu" aria-expanded="false">
     <span></span><span></span><span></span>
   </button>
 
-  <!-- Sidebar -->
+  <!-- Left sidebar -->
   <aside id="sidebar" class="sidebar" aria-hidden="true">
     <div class="sidebar-header">
       <h1 class="sidebar-title">personal hub</h1>
-      <button id="sidebar-close" class="sidebar-close" aria-label="Close menu">✕</button>
+      <!-- close button removed; burger itself moves here -->
     </div>
     <nav class="sidebar-nav">
       <div class="sidebar-group-label">important stuff</div>
@@ -38,8 +38,20 @@
     </nav>
   </aside>
 
-  <!-- Overlay (for mobile) -->
+  <!-- Overlay for left sidebar (mobile) -->
   <div id="sidebar-overlay" class="sidebar-overlay" aria-hidden="true"></div>
+
+  <!-- Right-side dock (widgets) -->
+  <div id="dock" class="dock">
+    <div id="dock-body" class="dock-body"></div>
+  </div>
+
+  <!-- Toggle buttons for widgets (fixed, right edge) -->
+  <div id="dock-buttons" class="dock-buttons">
+    <button class="dock-toggle" data-widget="todos" title="To-do">✅</button>
+    <button class="dock-toggle" data-widget="deadlines" title="Deadlines">⏳</button>
+    <button class="dock-toggle" data-widget="continue" title="Continue playing">🎮</button>
+  </div>
 
   <!-- App content -->
   <div class="app" id="app"></div>
