@@ -35,7 +35,6 @@ export function openGameCreate() {
   document.getElementById('game-mins').value = '0';
   document.querySelectorAll('.tag-chip').forEach(b => b.classList.remove('selected'));
 
-  // reset cover preview
   const uploader = document.querySelector('#game-modal .cover-uploader');
   if (uploader) uploader.innerHTML = `<div class="cover-placeholder">＋<br><span class="small-text">cover</span></div>`;
 
@@ -341,7 +340,7 @@ window.closeImageEditor = closeImageEditor;
 window.loadEditorImage = loadEditorImage;
 window.updateEditorZoom = updateEditorZoom;
 window.resetEditorView = resetEditorView;
-window.applyEditorImage = applyEditorImage;
+window.applyEditorImage = applyImageImage;
 window.stopPlaying = stopPlaying;
 window.editSessionEnd = editSessionEnd;
 window.addFinish = addFinish;
