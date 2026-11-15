@@ -584,3 +584,16 @@ body.sidebar-open .burger-btn {
   gap: 0.6rem;
 }
 .editor-controls input[type="range"] { flex: 1; }
+
+.game-card-drawn {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.game-card-drawn img {
+  width: 96px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
