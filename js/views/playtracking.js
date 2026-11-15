@@ -59,16 +59,40 @@ export function renderPlayTracking(root) {
 
   const recentSessions = [...state.playSessions].reverse().slice(0, 10);
 
-  // Build main content (left column)
-  const mainHTML = `
+  root.innerHTML = `
     ${backButton()}
     <h2>🎮 game library</h2>
 
+    <!-- ============ TOP DASHBOARD ============ -->
+    <div class="grid-2" style="margin-bottom: 1.5rem;">
+      <div class="card" style="margin-bottom: 0;">
+        <h3 style="font-size:1rem; margin-bottom:0.6rem;">recent sessions</h3>
+        ${recentSessions.length === 0 ? '<div class="empty-msg">no sessions yet</div>' :
+          recentSessions.map(s => `
+            <div class="history-item">
+              <strong>${escapeHTML(s.gameName)}</strong> — ${fmtDate(s.start)}
+              ${s.end
+                ? `→ ${Math.round((new Date(s.end) - new Date(s.start)) / 60000)}m
+                   <button class="small" onclick="editSessionEnd('${s.id}')">edit</button>`
+                : '· in progress'}
+            </div>
+          `).join('')}
+      </div>
+      <div class="card" style="margin-bottom: 0;">
+        <h3 style="font-size:1rem; margin-bottom:0.6rem;">backlog progress</h3>
+        <p class="small-text" style="margin-bottom:0.4rem;">games played this month</p>
+        <div class="timer-display" style="font-size:1.8rem; margin:0.2rem 0;">${playedThisMonth.size}</div>
+        <p class="small-text">out of ${state.games.length} in your library</p>
+      </div>
+    </div>
+
+    <!-- ============ LIBRARY HEADER ============ -->
     <div class="flex-between" style="margin-bottom:0.8rem;">
       <h3 style="font-size:1.1rem;">your games <span class="small-text">(${state.games.length})</span></h3>
       <button class="primary" onclick="openGameCreate()">＋ add game</button>
     </div>
 
+    <!-- ============ LIBRARY GRID ============ -->
     <div class="card">
       ${state.games.length === 0
         ? '<div class="empty-msg">no games yet — click “add game” to start 🎮</div>'
@@ -92,6 +116,7 @@ export function renderPlayTracking(root) {
           </div>`}
     </div>
 
+    <!-- ============ NOW PLAYING ============ -->
     ${active ? `
       <div class="card" style="border-left:4px solid var(--accent);">
         <h3>now playing: ${escapeHTML(active.gameName)}</h3>
@@ -100,6 +125,7 @@ export function renderPlayTracking(root) {
       </div>
     ` : ''}
 
+    <!-- ============ FINISH IT LIST ============ -->
     <div class="card">
       <h3>finish it list</h3>
       ${state.finishList.length === 0 ? '<div class="empty-msg">nothing on your finish list</div>' :
@@ -115,33 +141,33 @@ export function renderPlayTracking(root) {
       </div>
     </div>
 
-    <!-- game editor modal -->
+    <!-- ============ GAME EDITOR MODAL ============ -->
     <div id="game-modal" class="modal-backdrop hidden">
-      <div class="modal">
+      <div class="modal modal-wide">
         <div class="modal-header">
           <h3 id="game-modal-title">add game</h3>
           <button class="dock-close" onclick="closeGameModal()" aria-label="close">✕</button>
         </div>
 
-        <div class="row" style="align-items:flex-start;">
-          <div class="cover-uploader" onclick="openImageEditor()" title="click to add cover">
+        <div class="row" style="align-items:flex-start; gap: 1.5rem;">
+          <div class="cover-uploader cover-uploader-large" onclick="openImageEditor()" title="click to add cover">
             ${formState.imageData
               ? `<img src="${formState.imageData}" alt="cover">`
               : `<div class="cover-placeholder">＋<br><span class="small-text">cover</span></div>`}
           </div>
-          <div style="flex:1; min-width:180px;">
-            <input id="game-name" placeholder="game name" style="width:100%;">
-            <div class="row" style="margin-top:0.5rem; gap:0.4rem;">
+          <div style="flex:1; min-width:200px;">
+            <input id="game-name" placeholder="game name" style="width:100%; font-size:1.1rem; padding: 0.8rem 1rem;">
+            <div class="row" style="margin-top:0.8rem; gap:0.6rem;">
               <label class="small-text">hours played</label>
-              <input id="game-hours" type="number" min="0" step="1" value="0" style="width:70px;">
+              <input id="game-hours" type="number" min="0" step="1" value="0" style="width:80px;">
               <span class="small-text">h</span>
-              <input id="game-mins" type="number" min="0" max="59" step="1" value="0" style="width:70px;">
+              <input id="game-mins" type="number" min="0" max="59" step="1" value="0" style="width:80px;">
               <span class="small-text">m</span>
             </div>
           </div>
         </div>
 
-        <div style="margin-top:0.6rem;">
+        <div style="margin-top:1.2rem;">
           <span class="small-text">tags</span>
           <div id="tag-chip-row" class="tag-chip-row">
             ${TAG_OPTIONS.map(t => `
@@ -153,7 +179,7 @@ export function renderPlayTracking(root) {
           </div>
         </div>
 
-        <div class="row" style="margin-top:1rem; justify-content:space-between;">
+        <div class="row" style="margin-top:1.5rem; justify-content:space-between;">
           <div>
             ${formState.editingIndex !== null
               ? `<button class="small danger" onclick="deleteGame(${formState.editingIndex})">delete game</button>`
@@ -169,9 +195,9 @@ export function renderPlayTracking(root) {
       </div>
     </div>
 
-    <!-- image editor modal -->
+    <!-- ============ IMAGE EDITOR MODAL ============ -->
     <div id="image-editor" class="modal-backdrop hidden">
-      <div class="modal">
+      <div class="modal modal-wide">
         <div class="modal-header">
           <h3>cover image</h3>
           <button class="dock-close" onclick="closeImageEditor()" aria-label="close">✕</button>
@@ -188,46 +214,11 @@ export function renderPlayTracking(root) {
                  oninput="updateEditorZoom(this.value)">
           <button class="small" onclick="resetEditorView()">reset view</button>
         </div>
-        <div class="row" style="margin-top:0.8rem; justify-content:flex-end;">
+        <div class="row" style="margin-top:1rem; justify-content:flex-end;">
           <button onclick="closeImageEditor()">cancel</button>
           <button class="primary" onclick="applyEditorImage()">use this image</button>
         </div>
       </div>
-    </div>
-  `;
-
-  // Build page sidebar (right column)
-  const sidebarHTML = `
-    <aside class="page-sidebar">
-      <div class="card" style="margin-bottom:0.8rem;">
-        <h3 style="font-size:1rem;">recent sessions</h3>
-        ${recentSessions.length === 0 ? '<div class="empty-msg">no sessions yet</div>' :
-          recentSessions.map(s => `
-            <div class="history-item">
-              <strong>${escapeHTML(s.gameName)}</strong> — ${fmtDate(s.start)}
-              ${s.end
-                ? `→ ${Math.round((new Date(s.end) - new Date(s.start)) / 60000)}m
-                   <button class="small" onclick="editSessionEnd('${s.id}')">edit</button>`
-                : '· in progress'}
-            </div>
-          `).join('')}
-      </div>
-      <div class="card">
-        <h3 style="font-size:1rem;">backlog progress</h3>
-        <p class="small-text" style="margin-bottom:0.4rem;">games played this month</p>
-        <div class="timer-display" style="font-size:1.8rem; margin:0.2rem 0;">${playedThisMonth.size}</div>
-        <p class="small-text">out of ${state.games.length} in your library</p>
-      </div>
-    </aside>
-  `;
-
-  // Render the two-column layout
-  root.innerHTML = `
-    <div class="library-layout">
-      <div class="library-main">
-        ${mainHTML}
-      </div>
-      ${sidebarHTML}
     </div>
   `;
 
