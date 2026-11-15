@@ -1,8 +1,3 @@
-// ============================================================
-// ROUTER — decides which view renders based on currentPage
-// ============================================================
-import { highlightActive } from './sidebar.js';
-import { refreshDock } from './dock.js';
 import { renderHome } from '../views/home.js';
 import { renderDeadlines } from '../views/deadlines.js';
 import { renderTodos } from '../views/todos.js';
@@ -14,7 +9,8 @@ import { renderPlayTracking } from '../views/playtracking.js';
 import { renderMoodLog } from '../views/moodlog.js';
 import { renderJournal } from '../views/journal.js';
 import { renderData } from '../views/data.js';
-
+import { highlightActive } from './sidebar.js';
+import { refreshDock } from './dock.js';
 
 const routes = {
   home: renderHome,
@@ -35,7 +31,6 @@ let currentPage = 'home';
 export function getCurrentPage() { return currentPage; }
 
 export function navigate(page) {
-  // cleanup when leaving focus
   if (currentPage === 'focus' && page !== 'focus') {
     stopFocusTimer();
     window._focusSkips = new Set();
@@ -48,8 +43,7 @@ export function render() {
   const fn = routes[currentPage] || renderHome;
   fn(document.getElementById('app'));
   highlightActive(currentPage);
-  refreshDock();          // ← keeps the dock in sync
+  refreshDock();
 }
 
-// Expose navigate globally so inline onclick="navigate('...')" works
 window.navigate = navigate;
