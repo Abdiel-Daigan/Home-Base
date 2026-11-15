@@ -3,26 +3,17 @@
 // ============================================================
 import { state } from '../core/storage.js';
 import { backButton, escapeHTML, fmtDate } from '../core/utils.js';
+import { TAG_OPTIONS } from '../core/constants.js';
 import '../actions/playActions.js';
 
 let playTick = null;
 
-export const TAG_OPTIONS = [
-  'cozy', 'relaxing', 'farming', 'casual',
-  'intense', 'action', 'fast', 'competitive',
-  'story-heavy', 'narrative', 'rpg', 'adventure',
-  'puzzle', 'strategy', 'tactical', 'brain',
-  'short-session', 'arcade',
-  'brain-off', 'idle',
-];
-
-// Form state for create/edit. `editingIndex` is null when creating.
 const formState = {
   tags: new Set(),
   imageData: null,
-  editingIndex: null,   // index into state.games, or null
-  hoursPlayed: 0,       // manual hours played (editable)
-  minutesPlayed: 0,     // manual extra minutes (0–59)
+  editingIndex: null,
+  hoursPlayed: 0,
+  minutesPlayed: 0,
 };
 
 export function getFormState() { return formState; }
@@ -35,14 +26,12 @@ export function resetForm() {
   formState.minutesPlayed = 0;
 }
 
-// Compute total minutes for a game from sessions (completed only)
 function totalMinutesFor(name) {
   return state.playSessions
     .filter(s => s.end && s.gameName === name)
     .reduce((sum, s) => sum + (new Date(s.end) - new Date(s.start)) / 60000, 0);
 }
 
-// Compute recent minutes (last 14 days) for a game
 function recentMinutesFor(name) {
   const cutoff = Date.now() - 14 * 24 * 3600 * 1000;
   return state.playSessions
@@ -68,20 +57,18 @@ export function renderPlayTracking(root) {
     state.playSessions.filter(s => new Date(s.start) >= monthStart).map(s => s.gameName)
   );
 
-  // recent sessions (last 10)
   const recentSessions = [...state.playSessions].reverse().slice(0, 10);
 
-  root.innerHTML = `
+  // Build main content (left column)
+  const mainHTML = `
     ${backButton()}
     <h2>🎮 game library</h2>
 
-    <!-- ============ HEADER + ADD BUTTON ============ -->
     <div class="flex-between" style="margin-bottom:0.8rem;">
       <h3 style="font-size:1.1rem;">your games <span class="small-text">(${state.games.length})</span></h3>
       <button class="primary" onclick="openGameCreate()">＋ add game</button>
     </div>
 
-    <!-- ============ LIBRARY GRID ============ -->
     <div class="card">
       ${state.games.length === 0
         ? '<div class="empty-msg">no games yet — click “add game” to start 🎮</div>'
@@ -105,7 +92,6 @@ export function renderPlayTracking(root) {
           </div>`}
     </div>
 
-    <!-- ============ NOW PLAYING ============ -->
     ${active ? `
       <div class="card" style="border-left:4px solid var(--accent);">
         <h3>now playing: ${escapeHTML(active.gameName)}</h3>
@@ -114,7 +100,6 @@ export function renderPlayTracking(root) {
       </div>
     ` : ''}
 
-    <!-- ============ FINISH IT LIST ============ -->
     <div class="card">
       <h3>finish it list</h3>
       ${state.finishList.length === 0 ? '<div class="empty-msg">nothing on your finish list</div>' :
@@ -130,7 +115,7 @@ export function renderPlayTracking(root) {
       </div>
     </div>
 
-    <!-- ============ GAME EDITOR MODAL (create + edit) ============ -->
+    <!-- game editor modal -->
     <div id="game-modal" class="modal-backdrop hidden">
       <div class="modal">
         <div class="modal-header">
@@ -184,7 +169,7 @@ export function renderPlayTracking(root) {
       </div>
     </div>
 
-    <!-- ============ IMAGE EDITOR MODAL ============ -->
+    <!-- image editor modal -->
     <div id="image-editor" class="modal-backdrop hidden">
       <div class="modal">
         <div class="modal-header">
@@ -211,7 +196,7 @@ export function renderPlayTracking(root) {
     </div>
   `;
 
-  // Bottom-right sidebar (part of page body)
+  // Build page sidebar (right column)
   const sidebarHTML = `
     <aside class="page-sidebar">
       <div class="card" style="margin-bottom:0.8rem;">
@@ -236,18 +221,12 @@ export function renderPlayTracking(root) {
     </aside>
   `;
 
-  // Wrap main content + sidebar in a two-column layout
-  // Rebuild root with a flex layout: content on left, sidebar on right
-  const existingContent = root.innerHTML;
   root.innerHTML = `
     <div class="library-layout">
-      <div class="library-main">${existingContent}</div>
+      <div class="library-main">${mainHTML}</div>
       ${sidebarHTML}
     </div>
   `;
-
-  // Move the modals back out of the layout so they overlay correctly
-  // (they are position:fixed, so being inside a flex child is fine — leave them.)
 
   if (active) {
     playTick = setInterval(() => {
