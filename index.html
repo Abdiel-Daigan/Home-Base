@@ -7,7 +7,43 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <!-- Burger button (always visible, top-left) -->
+  <button id="burger-btn" class="burger-btn" aria-label="Toggle menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar" aria-hidden="true">
+    <div class="sidebar-header">
+      <h1 class="sidebar-title">personal hub</h1>
+      <button id="sidebar-close" class="sidebar-close" aria-label="Close menu">✕</button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-group-label">important stuff</div>
+      <a class="sidebar-link" href="#" data-page="deadlines">⏳ deadlines</a>
+      <a class="sidebar-link" href="#" data-page="todos">✅ to-do list</a>
+      <a class="sidebar-link" href="#" data-page="focus">🎯 what now?</a>
+      <a class="sidebar-link" href="#" data-page="checkin">📅 daily check-in</a>
+      <a class="sidebar-link" href="#" data-page="notes">📝 quick notes</a>
+
+      <div class="sidebar-group-label">things i love</div>
+      <a class="sidebar-link" href="#" data-page="gamepicker">🎮 mood game picker</a>
+      <a class="sidebar-link" href="#" data-page="playtracking">⏱️ play tracking</a>
+      <a class="sidebar-link" href="#" data-page="moodlog">📊 mood log</a>
+      <a class="sidebar-link" href="#" data-page="journal">🎨 project journal</a>
+      <a class="sidebar-link" href="#" data-page="data">💾 data</a>
+
+      <div class="sidebar-group-label">home</div>
+      <a class="sidebar-link" href="#" data-page="home">🏠 home</a>
+    </nav>
+  </aside>
+
+  <!-- Overlay (for mobile) -->
+  <div id="sidebar-overlay" class="sidebar-overlay" aria-hidden="true"></div>
+
+  <!-- App content -->
   <div class="app" id="app"></div>
+
   <script type="module" src="js/main.js"></script>
 </body>
 </html>
