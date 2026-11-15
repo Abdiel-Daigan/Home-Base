@@ -2,11 +2,10 @@
 // ACTIONS — play sessions + game library + image editor
 // ============================================================
 import { state, saveState } from '../core/storage.js';
-import { nowISO, uid, escapeHTML } from '../core/utils.js';
+import { nowISO, uid } from '../core/utils.js';
 import { render } from '../core/router.js';
 import { getFormState, resetForm } from '../views/playtracking.js';
 
-// ---- cover spec ----
 const COVER_W = 320;
 const COVER_H = 180;
 
@@ -18,7 +17,6 @@ export function toggleTagChip(tag) {
   if (f.tags.has(tag)) f.tags.delete(tag);
   else f.tags.add(tag);
 
-  // update the chip's class in place (no full re-render)
   document.querySelectorAll('.tag-chip').forEach(btn => {
     if (btn.dataset.tag === tag) {
       btn.classList.toggle('selected', f.tags.has(tag));
@@ -46,7 +44,6 @@ export function addGame() {
   });
   saveState();
 
-  // clear the form and re-render
   resetForm();
   if (nameInput) nameInput.value = '';
   render();
@@ -60,14 +57,13 @@ export function deleteGame(index) {
 }
 
 /* ============================================================
-   IMAGE EDITOR — crop/zoom a square-ish source into 320×180
+   IMAGE EDITOR
 ============================================================ */
-// Loaded image + view state live in a window-scoped object so
-// the canvas redraws keep working across renders.
 window._editorState = {
-  image: null,     // HTMLImageElement
+  image: null,
   zoom: 1,
-  offsetX: 0,      // px offset of the image's top-left within the canvas, pre-zoom
+  baseScale: 1,
+  offsetX: 0,
   offsetY: 0,
   dragging: false,
   lastX: 0,
@@ -76,7 +72,6 @@ window._editorState = {
 
 export function openImageEditor() {
   document.getElementById('image-editor').classList.remove('hidden');
-  // if there's already a chosen image, draw it
   if (window._editorState.image) requestAnimationFrame(drawEditor);
   wireEditorDrag();
 }
@@ -94,12 +89,9 @@ export function loadEditorImage(ev) {
     img.onload = () => {
       const es = window._editorState;
       es.image = img;
-      // center the image and fit it inside the canvas
       const scale = Math.min(COVER_W / img.width, COVER_H / img.height);
       es.zoom = 1;
-      // store a "base scale" used when rendering
       es.baseScale = scale;
-      // center: offset in canvas space after base scale
       es.offsetX = (COVER_W - img.width * scale) / 2;
       es.offsetY = (COVER_H - img.height * scale) / 2;
       document.getElementById('editor-zoom').value = '1';
@@ -114,7 +106,6 @@ export function loadEditorImage(ev) {
 export function updateEditorZoom(val) {
   const es = window._editorState;
   if (!es.image) return;
-  // zoom is applied around the canvas center
   es.zoom = parseFloat(val);
   drawEditor();
 }
@@ -137,13 +128,10 @@ export function drawEditor() {
   if (!canvas || !es.image) return;
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, COVER_W, COVER_H);
-
-  // dark background so empty areas read as "not part of the image"
   ctx.fillStyle = '#0b0d10';
   ctx.fillRect(0, 0, COVER_W, COVER_H);
 
   ctx.save();
-  // zoom around center
   ctx.translate(COVER_W / 2, COVER_H / 2);
   ctx.scale(es.zoom, es.zoom);
   ctx.translate(-COVER_W / 2, -COVER_H / 2);
@@ -208,7 +196,6 @@ export function applyEditorImage() {
   const f = getFormState();
   f.imageData = data;
 
-  // close modal, swap the preview and button label without full re-render
   closeImageEditor();
   const uploader = document.querySelector('.cover-uploader');
   if (uploader) {
@@ -220,7 +207,7 @@ export function applyEditorImage() {
 }
 
 /* ============================================================
-   PLAY SESSIONS (unchanged behaviour)
+   PLAY SESSIONS
 ============================================================ */
 export function stopPlaying(sessionId) {
   const s = state.playSessions.find(s => s.id === sessionId);
@@ -252,7 +239,6 @@ export function removeFinish(i) {
   render();
 }
 
-/* ---- inline-handler bindings ---- */
 window.toggleTagChip = toggleTagChip;
 window.addGame = addGame;
 window.deleteGame = deleteGame;
