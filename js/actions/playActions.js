@@ -2,8 +2,9 @@
 // ACTIONS — game library, image editor, play sessions
 // ============================================================
 import { state, saveState } from '../core/storage.js';
-import { nowISO, uid } from '../core/utils.js';
+import { nowISO } from '../core/utils.js';
 import { render } from '../core/router.js';
+import { TAG_OPTIONS } from '../core/constants.js';
 import { getFormState, resetForm } from '../views/playtracking.js';
 
 const COVER_W = 320;
@@ -14,12 +15,10 @@ const COVER_H = 180;
 ============================================================ */
 export function openGameCreate() {
   resetForm();
-  // ensure the editor state is cleared so the old cover is not shown
   window._editorState = {
     image: null, zoom: 1, baseScale: 1,
     offsetX: 0, offsetY: 0, dragging: false, lastX: 0, lastY: 0,
   };
-  // reset canvas + hint
   const hint = document.getElementById('editor-hint');
   if (hint) hint.style.display = '';
   const canvas = document.getElementById('editor-canvas');
@@ -35,6 +34,11 @@ export function openGameCreate() {
   document.getElementById('game-hours').value = '0';
   document.getElementById('game-mins').value = '0';
   document.querySelectorAll('.tag-chip').forEach(b => b.classList.remove('selected'));
+
+  // reset cover preview
+  const uploader = document.querySelector('#game-modal .cover-uploader');
+  if (uploader) uploader.innerHTML = `<div class="cover-placeholder">＋<br><span class="small-text">cover</span></div>`;
+
   document.getElementById('game-modal').classList.remove('hidden');
 }
 
@@ -50,8 +54,6 @@ export function openGameEdit(index) {
   f.hoursPlayed = Math.floor((g.manualMinutes || 0) / 60);
   f.minutesPlayed = (g.manualMinutes || 0) % 60;
 
-  // clear the editor state so the editor shows "no image yet"
-  // (the game's own image is shown in the form preview separately)
   window._editorState = {
     image: null, zoom: 1, baseScale: 1,
     offsetX: 0, offsetY: 0, dragging: false, lastX: 0, lastY: 0,
@@ -71,16 +73,14 @@ export function openGameEdit(index) {
   document.getElementById('game-hours').value = String(f.hoursPlayed);
   document.getElementById('game-mins').value = String(f.minutesPlayed);
 
-  // rebuild tag chips with selected state
   const row = document.getElementById('tag-chip-row');
-  row.innerHTML = (window.TAG_OPTIONS_LIST || []).map(t => `
+  row.innerHTML = TAG_OPTIONS.map(t => `
     <button type="button"
             class="tag-chip ${f.tags.has(t) ? 'selected' : ''}"
             data-tag="${t}"
             onclick="toggleTagChip('${t}')">${t}</button>
   `).join('');
 
-  // rebuild cover preview
   const uploader = document.querySelector('#game-modal .cover-uploader');
   if (uploader) {
     uploader.innerHTML = f.imageData
@@ -290,7 +290,6 @@ export function applyEditorImage() {
   const f = getFormState();
   f.imageData = data;
 
-  // update the form preview inside the game modal
   const uploader = document.querySelector('#game-modal .cover-uploader');
   if (uploader) uploader.innerHTML = `<img src="${data}" alt="cover">`;
 
@@ -329,10 +328,6 @@ export function removeFinish(i) {
   saveState();
   render();
 }
-
-/* ---- expose tag list for edit rebuild ---- */
-import { TAG_OPTIONS } from '../views/playtracking.js';
-window.TAG_OPTIONS_LIST = TAG_OPTIONS;
 
 /* ---- inline handler bindings ---- */
 window.openGameCreate = openGameCreate;
