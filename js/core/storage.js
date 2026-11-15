@@ -7,7 +7,7 @@ export const defaultState = {
   assignments: [],
   todos: [],
   notes: [],
-  games: [],
+  games: [],        // [{ name, tags: [], image: dataURL|null }]
   playSessions: [],
   moodLog: [],
   checkins: [],
@@ -25,7 +25,6 @@ export function loadState() {
   }
 }
 
-// The single live state object. All modules import this and mutate it.
 export const state = loadState();
 
 export function saveState() {
@@ -33,7 +32,6 @@ export function saveState() {
 }
 
 export function replaceState(newState) {
-  // wipe keys, then copy in new ones (keeps the same object reference)
   for (const k of Object.keys(state)) delete state[k];
   Object.assign(state, structuredClone(defaultState), newState);
   saveState();
