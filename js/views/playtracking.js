@@ -108,7 +108,7 @@ export function renderPlayTracking(root) {
                   <div class="game-lib-info">
                     <strong>${escapeHTML(g.name)}</strong>
                     <div class="small-text">${fmtHM(total)} total</div>
-                    <div class="small-text">${fmtHM(recent)} recent</div>
+                    ${recent > 0 ? `<div class="small-text deadline-green">${fmtHM(recent)} recent</div>` : ''}
                   </div>
                 </div>
               `;
