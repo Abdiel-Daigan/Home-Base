@@ -1,8 +1,378 @@
 /* ============================================================
+   GLOBAL STYLES · DARK CALM THEME
+============================================================ */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+body {
+  background: #0d0f12;
+  color: #e3e6ea;
+  padding: 1.5rem 1rem 3rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.app {
+  max-width: 1000px;
+  width: 100%;
+  padding-top: 4.5rem;
+}
+
+:root {
+  --accent: #5ee0c0;
+  --accent-dim: #2e8b7a;
+  --bg-card: #1a1e24;
+  --bg-card-hover: #23282f;
+  --border: #2e353e;
+  --text-dim: #9aa5b5;
+  --danger: #e06c6c;
+  --warn: #e0b85e;
+  --ok: #5ee0a0;
+}
+
+h1, h2, h3 { font-weight: 500; letter-spacing: -0.01em; }
+h1 { font-size: 2rem; color: var(--accent); margin-bottom: 0.25rem; }
+h2 { font-size: 1.4rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+
+.back-home {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: var(--bg-card); border: 1px solid var(--border);
+  color: var(--accent); padding: 0.4rem 0.9rem; border-radius: 40px;
+  font-size: 0.9rem; cursor: pointer; margin-bottom: 1.5rem; transition: 0.15s;
+}
+.back-home:hover { background: var(--bg-card-hover); border-color: var(--accent-dim); }
+
+.card {
+  background: var(--bg-card); border-radius: 24px;
+  padding: 1.25rem 1.4rem; border: 1px solid var(--border); margin-bottom: 1rem;
+}
+
+.row { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+
+.tile {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 24px; padding: 1.4rem 1.2rem; cursor: pointer;
+  transition: 0.15s; display: flex; flex-direction: column; gap: 0.5rem;
+}
+.tile:hover { background: var(--bg-card-hover); border-color: var(--accent-dim); }
+.tile .icon { font-size: 2rem; line-height: 1; }
+.tile h3 { font-size: 1.2rem; color: var(--accent); }
+.tile p { font-size: 0.9rem; color: var(--text-dim); }
+
+input, textarea, select, button {
+  background: #0b0d10; border: 1px solid var(--border); color: #e3e6ea;
+  border-radius: 16px; padding: 0.6rem 0.9rem; font-size: 0.95rem;
+  outline: none; transition: 0.1s; font-family: inherit;
+}
+input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+
+button {
+  background: var(--bg-card-hover); border: 1px solid var(--border);
+  cursor: pointer; color: #e3e6ea; font-weight: 500;
+}
+button.primary { background: var(--accent); color: #0d0f12; border: none; font-weight: 600; }
+button.primary:hover { opacity: 0.85; }
+button.danger { border-color: var(--danger); color: var(--danger); }
+button.small { padding: 0.3rem 0.8rem; font-size: 0.8rem; border-radius: 30px; }
+
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.deadline-green { color: var(--ok); }
+.deadline-yellow { color: var(--warn); }
+.deadline-red { color: var(--danger); }
+.empty-msg { color: var(--text-dim); font-style: italic; padding: 1rem 0; text-align: center; }
+.hidden { display: none !important; }
+.tag {
+  background: #2a3038; padding: 0.15rem 0.7rem;
+  border-radius: 30px; font-size: 0.75rem; color: var(--text-dim);
+}
+hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+.history-item { padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+
+.group-label {
+  font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-dim); margin: 1.5rem 0 0.6rem;
+}
+
+.timer-display {
+  font-size: 2.5rem; font-variant-numeric: tabular-nums; font-weight: 300;
+  color: var(--accent); text-align: center; margin: 0.5rem 0;
+}
+
+.deck {
+  background: linear-gradient(145deg, #1f2630, #151a21);
+  border-radius: 24px; padding: 2rem 1.5rem; text-align: center;
+  border: 2px dashed var(--accent-dim); cursor: pointer; transition: 0.2s; margin: 1rem 0;
+}
+.deck:hover { border-color: var(--accent); background: #1d242d; }
+
+.game-card {
+  background: var(--bg-card); border-radius: 20px;
+  padding: 1rem 1.2rem; margin-bottom: 0.7rem; border-left: 4px solid var(--accent);
+}
+
+.mood-btn {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 40px; padding: 0.6rem 1.1rem; cursor: pointer;
+  transition: 0.1s; font-size: 0.95rem;
+}
+.mood-btn:hover { background: var(--bg-card-hover); border-color: var(--accent); }
+.mood-btn.selected { background: var(--accent); color: #0d0f12; font-weight: 600; border-color: var(--accent); }
+
+.project-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem; margin-top: 1rem;
+}
+.project-card {
+  background: #12161c; border-radius: 20px; padding: 0.9rem;
+  border: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.4rem;
+}
+.project-card img {
+  max-width: 100%; border-radius: 14px; max-height: 140px; object-fit: cover;
+}
+.small-text { font-size: 0.8rem; color: var(--text-dim); }
+
+/* ============================================================
+   BURGER + LEFT SIDEBAR
+============================================================ */
+.burger-btn {
+  position: fixed; top: 1rem; left: 1rem; z-index: 1100;
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--bg-card); border: 1px solid var(--border);
+  display: flex; flex-direction: column; justify-content: center;
+  align-items: center; gap: 5px; cursor: pointer;
+  transition: top 0.25s ease, left 0.25s ease, right 0.25s ease,
+              background 0.15s, border-color 0.15s;
+}
+.burger-btn:hover { background: var(--bg-card-hover); border-color: var(--accent-dim); }
+.burger-btn span {
+  display: block; width: 20px; height: 2px;
+  background: var(--accent); border-radius: 2px;
+  transition: transform 0.2s, opacity 0.2s;
+}
+.burger-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.burger-btn.open span:nth-child(2) { opacity: 0; }
+.burger-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+body.sidebar-open .burger-btn {
+  left: calc(280px - 60px);
+  top: 1rem;
+}
+
+.sidebar {
+  position: fixed; top: 0; left: 0; height: 100vh; width: 280px;
+  background: #12161c; border-right: 1px solid var(--border);
+  padding: 1.2rem 1rem 1.5rem; overflow-y: auto;
+  transform: translateX(-100%); transition: transform 0.25s ease;
+  z-index: 1050; display: flex; flex-direction: column; gap: 0.4rem;
+}
+.sidebar.open { transform: translateX(0); }
+
+.sidebar-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-bottom: 0.8rem; border-bottom: 1px solid var(--border);
+  margin-bottom: 0.6rem; min-height: 48px;
+}
+.sidebar-title { font-size: 1.2rem; color: var(--accent); font-weight: 600; }
+
+.sidebar-group-label {
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--text-dim); margin: 0.9rem 0.4rem 0.4rem;
+}
+
+.sidebar-link {
+  display: block; padding: 0.55rem 0.8rem; border-radius: 14px;
+  color: #e3e6ea; text-decoration: none; font-size: 0.95rem; transition: 0.12s;
+}
+.sidebar-link:hover { background: var(--bg-card-hover); color: var(--accent); }
+.sidebar-link.active { background: var(--accent); color: #0d0f12; font-weight: 600; }
+
+.sidebar-overlay {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px); opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease; z-index: 1040;
+}
+.sidebar-overlay.show { opacity: 1; pointer-events: auto; }
+
+/* ============================================================
+   RIGHT DOCK — widgets
+============================================================ */
+.dock-buttons {
+  position: fixed; top: 50%; right: 0; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 0.5rem; z-index: 1000;
+  padding: 0.4rem; background: var(--bg-card); border: 1px solid var(--border);
+  border-right: none; border-radius: 16px 0 0 16px;
+}
+.dock-toggle {
+  width: 42px; height: 42px; border-radius: 12px; font-size: 1.2rem;
+  display: flex; align-items: center; justify-content: center; padding: 0;
+}
+.dock-toggle.active { background: var(--accent); color: #0d0f12; border-color: var(--accent); }
+
+.dock {
+  position: fixed; top: 0; right: 0; height: 100vh; width: 320px;
+  background: #12161c; border-left: 1px solid var(--border);
+  transform: translateX(100%); transition: transform 0.25s ease;
+  z-index: 1040; display: flex; flex-direction: column;
+}
+.dock.open { transform: translateX(0); }
+
+.dock-body { padding: 1rem 1.1rem; overflow-y: auto; height: 100%; }
+.dock-widget-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;
+}
+.dock-widget-header h3 { font-size: 1.05rem; color: var(--accent); }
+.dock-close {
+  background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+  width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+  font-size: 0.85rem; padding: 0;
+}
+.dock-close:hover { color: var(--accent); border-color: var(--accent-dim); }
+
+.dock-item {
+  display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
+  padding: 0.55rem 0.7rem; border-radius: 14px; background: var(--bg-card);
+  border: 1px solid var(--border); margin-bottom: 0.4rem; font-size: 0.9rem;
+}
+.dock-item.done { opacity: 0.55; text-decoration: line-through; }
+.dock-item .dock-item-name { flex: 1; word-break: break-word; }
+.dock-empty { color: var(--text-dim); font-style: italic; font-size: 0.85rem; padding: 0.6rem 0; }
+.dock-add-row { display: flex; gap: 0.4rem; margin-top: 0.6rem; }
+.dock-add-row input { flex: 1; padding: 0.45rem 0.7rem; font-size: 0.85rem; }
+.dock-add-row button { padding: 0.45rem 0.8rem; font-size: 0.85rem; }
+
+@media (max-width: 600px) {
+  .dock { width: 90vw; }
+  body.sidebar-open .burger-btn { left: calc(90vw - 60px); }
+}
+
+/* ============================================================
+   GAME LIBRARY
+============================================================ */
+.cover-uploader {
+  width: 120px; height: 68px; border-radius: 14px;
+  border: 2px dashed var(--border); background: #0b0d10;
+  overflow: hidden; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; transition: 0.15s;
+}
+.cover-uploader:hover { border-color: var(--accent); }
+.cover-uploader img { width: 100%; height: 100%; object-fit: cover; }
+.cover-placeholder {
+  text-align: center; color: var(--text-dim); font-size: 1.2rem; line-height: 1.2;
+}
+
+.tag-chip-row { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.35rem; }
+.tag-chip {
+  font-size: 0.75rem; padding: 0.25rem 0.65rem; border-radius: 30px;
+  background: #0b0d10; border: 1px solid var(--border); color: var(--text-dim);
+  cursor: pointer; transition: 0.12s;
+}
+.tag-chip:hover { border-color: var(--accent-dim); color: var(--accent); }
+.tag-chip.selected {
+  background: var(--accent); border-color: var(--accent);
+  color: #0d0f12; font-weight: 600;
+}
+
+.game-library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.8rem;
+  margin-top: 0.6rem;
+}
+.game-lib-card {
+  position: relative;
+  background: #12161c;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.game-lib-card:hover {
+  transform: scale(1.04);
+  border-color: var(--accent-dim);
+  box-shadow: 0 6px 20px rgba(94, 224, 192, 0.08);
+  z-index: 2;
+}
+.game-lib-card img {
+  width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block;
+}
+.game-lib-placeholder {
+  aspect-ratio: 16 / 9; display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; background: #0b0d10;
+}
+.game-lib-info { padding: 0.5rem 0.65rem; }
+.game-lib-info strong { font-size: 0.9rem; }
+.game-lib-info .small-text { margin-top: 0.15rem; }
+
+.game-card-drawn { display: flex; align-items: center; gap: 0.8rem; }
+.game-card-drawn img {
+  width: 96px; height: 54px; object-fit: cover; border-radius: 10px; flex-shrink: 0;
+}
+
+/* ============================================================
+   IMAGE EDITOR MODAL
+============================================================ */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(3px); z-index: 1200;
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+}
+.modal-backdrop.hidden { display: none; }
+
+.modal {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 22px; padding: 1.2rem 1.3rem;
+  width: min(460px, 100%); max-height: 92vh; overflow-y: auto;
+}
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;
+}
+.modal-header h3 { color: var(--accent); font-size: 1.1rem; }
+
+.editor-stage {
+  position: relative; margin: 0.8rem 0; background: #0b0d10;
+  border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+#editor-canvas {
+  width: 100%; height: auto; aspect-ratio: 16 / 9; display: block;
+  touch-action: none; cursor: grab;
+}
+#editor-canvas:active { cursor: grabbing; }
+
+.editor-hint {
+  position: absolute; inset: 0; display: flex; align-items: center;
+  justify-content: center; color: var(--text-dim); font-style: italic;
+  pointer-events: none;
+}
+
+.editor-controls { display: flex; align-items: center; gap: 0.6rem; }
+.editor-controls input[type="range"] { flex: 1; }
+
+/* ============================================================
+   DOCK — continue playing thumbnails
+============================================================ */
+.dock-item-game { align-items: flex-start; }
+.dock-thumb {
+  width: 56px; height: 32px; border-radius: 6px; object-fit: cover; flex-shrink: 0;
+}
+.dock-thumb-placeholder {
+  display: flex; align-items: center; justify-content: center;
+  background: #0b0d10; font-size: 1rem;
+}
+
+/* ============================================================
    GAME LIBRARY PAGE LAYOUT
 ============================================================ */
-/* The main container uses flex to put the library in the middle 
-   and the vertical sidebar on the right */
 .library-layout {
   display: flex;
   align-items: flex-start;
@@ -10,29 +380,23 @@
   width: 100%;
 }
 
-/* The library itself flexes to fill space but has a max width 
-   so the games don't stretch too wide */
 .library-main {
   flex: 1;
   min-width: 0;
   max-width: 800px; 
-  margin: 0 auto; /* centers the content */
+  margin: 0 auto;
 }
 
-/* The vertical sidebar on the right edge */
 .page-sidebar {
   width: 280px;
   flex-shrink: 0;
   position: sticky;
   top: 1rem;
-  /* If you want it to look like a full-height panel later, 
-     you can add a background color and border here */
   min-height: calc(100vh - 2rem);
   display: flex;
   flex-direction: column;
 }
 
-/* Stack them on mobile */
 @media (max-width: 1000px) {
   .library-layout {
     flex-direction: column;
