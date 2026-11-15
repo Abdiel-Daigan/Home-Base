@@ -1,6 +1,7 @@
 // ============================================================
 // ROUTER — decides which view renders based on currentPage
 // ============================================================
+import { highlightActive } from './sidebar.js';
 import { renderHome } from '../views/home.js';
 import { renderDeadlines } from '../views/deadlines.js';
 import { renderTodos } from '../views/todos.js';
@@ -44,6 +45,7 @@ export function navigate(page) {
 export function render() {
   const fn = routes[currentPage] || renderHome;
   fn(document.getElementById('app'));
+  highlightActive(currentPage);   // ← new
 }
 
 // Expose navigate globally so inline onclick="navigate('...')" works
