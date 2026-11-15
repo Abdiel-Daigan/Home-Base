@@ -61,15 +61,15 @@ export function renderGamePicker(root) {
         ` : `
           <div style="margin-top:1rem;">
             ${drawn.map(g => `
-  <div class="game-card game-card-drawn">
-    ${g.image ? `<img src="${g.image}" alt="">` : ''}
-    <div style="flex:1;">
-      <strong>${escapeHTML(g.name)}</strong>
-      <div class="small-text" style="margin-top:0.2rem;">${(g.tags || []).join(', ')}</div>
-    </div>
-    <button class="small primary" onclick="playGame('${escapeHTML(g.name)}')">play this</button>
-  </div>
-`).join('')}
+              <div class="game-card game-card-drawn">
+                ${g.image ? `<img src="${g.image}" alt="">` : ''}
+                <div style="flex:1;">
+                  <strong>${escapeHTML(g.name)}</strong>
+                  <div class="small-text" style="margin-top:0.2rem;">${(g.tags || []).join(', ')}</div>
+                </div>
+                <button class="small primary" onclick="playGame('${escapeHTML(g.name)}')">play this</button>
+              </div>
+            `).join('')}
           </div>
           <div class="row" style="margin-top:0.8rem;">
             <button class="small" ${redraws >= 2 ? 'disabled' : ''} onclick="redraw()">
