@@ -240,7 +240,6 @@ hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
 .burger-btn.open span:nth-child(2) { opacity: 0; }
 .burger-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-/* Move burger to the top-right of the sidebar when it's open */
 body.sidebar-open .burger-btn {
   left: calc(280px - 60px);
   top: 1rem;
@@ -416,7 +415,6 @@ body.sidebar-open .burger-btn {
 .dock-add-row input { flex: 1; padding: 0.45rem 0.7rem; font-size: 0.85rem; }
 .dock-add-row button { padding: 0.45rem 0.8rem; font-size: 0.85rem; }
 
-/* Mobile adjustments */
 @media (max-width: 600px) {
   .dock { width: 90vw; }
   body.sidebar-open .burger-btn { left: calc(90vw - 60px); }
@@ -513,6 +511,19 @@ body.sidebar-open .burger-btn {
   backdrop-filter: blur(2px);
 }
 
+.game-card-drawn {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.game-card-drawn img {
+  width: 96px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
 /* ============================================================
    IMAGE EDITOR MODAL
 ============================================================ */
@@ -585,15 +596,21 @@ body.sidebar-open .burger-btn {
 }
 .editor-controls input[type="range"] { flex: 1; }
 
-.game-card-drawn {
+/* ============================================================
+   DOCK — continue playing thumbnails
+============================================================ */
+.dock-item-game { align-items: flex-start; }
+.dock-thumb {
+  width: 56px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.dock-thumb-placeholder {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-}
-.game-card-drawn img {
-  width: 96px;
-  height: 54px;
-  object-fit: cover;
-  border-radius: 10px;
-  flex-shrink: 0;
+  justify-content: center;
+  background: #0b0d10;
+  font-size: 1rem;
 }
