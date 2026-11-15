@@ -1,10 +1,10 @@
 // ============================================================
-// SIDEBAR — burger toggle, overlay, close, active link
+// SIDEBAR — burger toggle, overlay, active link
+// Burger itself moves to the sidebar's top-right when open.
 // ============================================================
-const sidebar    = document.getElementById('sidebar');
-const overlay    = document.getElementById('sidebar-overlay');
-const burger     = document.getElementById('burger-btn');
-const closeBtn   = document.getElementById('sidebar-close');
+const sidebar  = document.getElementById('sidebar');
+const overlay  = document.getElementById('sidebar-overlay');
+const burger   = document.getElementById('burger-btn');
 
 export function openSidebar() {
   sidebar.classList.add('open');
@@ -25,8 +25,7 @@ export function closeSidebar() {
 }
 
 export function toggleSidebar() {
-  if (sidebar.classList.contains('open')) closeSidebar();
-  else openSidebar();
+  sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
 }
 
 export function highlightActive(page) {
@@ -37,20 +36,14 @@ export function highlightActive(page) {
 
 export function initSidebar() {
   burger.addEventListener('click', toggleSidebar);
-  closeBtn.addEventListener('click', closeSidebar);
   overlay.addEventListener('click', closeSidebar);
-
-  // Esc closes
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeSidebar();
   });
-
-  // Link clicks navigate + close
   document.querySelectorAll('.sidebar-link').forEach(a => {
     a.addEventListener('click', (e) => {
       e.preventDefault();
-      const page = a.dataset.page;
-      if (page) window.navigate(page);
+      if (a.dataset.page) window.navigate(a.dataset.page);
       closeSidebar();
     });
   });
