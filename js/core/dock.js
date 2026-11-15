@@ -1,16 +1,14 @@
 // ============================================================
 // RIGHT DOCK — widgets: todos, deadlines, continue playing
-// Only one widget open at a time. Each can be closed.
 // ============================================================
 import { state, saveState } from '../core/storage.js';
 import { escapeHTML, uid, fmtDate } from '../core/utils.js';
 import { render as rerender } from '../core/router.js';
 
-const dock       = document.getElementById('dock');
-const dockBody   = document.getElementById('dock-body');
+const dock        = document.getElementById('dock');
+const dockBody    = document.getElementById('dock-body');
 const dockButtons = document.getElementById('dock-buttons');
 
-// The widget currently open: 'todos' | 'deadlines' | 'continue' | null
 let currentWidget = null;
 
 export function openWidget(name) {
@@ -33,7 +31,6 @@ export function toggleWidget(name) {
   else openWidget(name);
 }
 
-/* ---------- render dispatcher ---------- */
 function renderWidget() {
   if (!currentWidget) { dockBody.innerHTML = ''; return; }
   if (currentWidget === 'todos')      dockBody.innerHTML = renderTodosWidget();
@@ -41,7 +38,6 @@ function renderWidget() {
   if (currentWidget === 'continue')   dockBody.innerHTML = renderContinueWidget();
 }
 
-/* ---------- TODOS ---------- */
 function renderTodosWidget() {
   const items = (state.todos || []).filter(t => !t.done);
   return `
@@ -71,7 +67,7 @@ export function dockAddTodo() {
   state.todos.push({ id: uid(), text, priority: 'medium', done: false });
   saveState();
   renderWidget();
-  rerender(); // keep main views in sync
+  rerender();
 }
 
 export function dockToggleTodo(id) {
@@ -79,7 +75,6 @@ export function dockToggleTodo(id) {
   if (t) { t.done = !t.done; saveState(); renderWidget(); rerender(); }
 }
 
-/* ---------- DEADLINES ---------- */
 function renderDeadlinesWidget() {
   const sorted = [...state.assignments].sort((a, b) => new Date(a.due) - new Date(b.due));
   return `
@@ -100,8 +95,6 @@ function renderDeadlinesWidget() {
   `;
 }
 
-/* ---------- CONTINUE PLAYING ---------- */
-/* Recent games (last 30 days) sorted by most recent start, deduped */
 function renderContinueWidget() {
   const cutoff = Date.now() - 30 * 24 * 3600 * 1000;
   const recent = state.playSessions
@@ -127,9 +120,14 @@ function renderContinueWidget() {
     ${games.length === 0
       ? '<div class="dock-empty">no recent games — start one from the game picker</div>'
       : games.map(g => {
+        const lib = state.games.find(x => x.name === g.gameName);
+        const thumb = lib?.image
+          ? `<img src="${lib.image}" class="dock-thumb" alt="">`
+          : `<div class="dock-thumb dock-thumb-placeholder">🎮</div>`;
         const isActive = active && active.gameName === g.gameName;
         return `
-          <div class="dock-item">
+          <div class="dock-item dock-item-game">
+            ${thumb}
             <span class="dock-item-name">
               ${escapeHTML(g.gameName)}
               <br><span class="small-text">last played ${fmtDate(g.start)}</span>
@@ -162,25 +160,21 @@ export function dockStopPlay(sessionId) {
   if (s) { s.end = new Date().toISOString(); saveState(); renderWidget(); rerender(); }
 }
 
-/* ---------- init + global exposure ---------- */
 export function initDock() {
   dockButtons.querySelectorAll('.dock-toggle').forEach(btn => {
     btn.addEventListener('click', () => toggleWidget(btn.dataset.widget));
   });
-  // Esc closes dock too
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && currentWidget) closeWidget();
   });
 }
 
-// Inline handlers
 window.closeDock = closeWidget;
 window.dockAddTodo = dockAddTodo;
 window.dockToggleTodo = dockToggleTodo;
 window.dockPlayGame = dockPlayGame;
 window.dockStopPlay = dockStopPlay;
 
-// Re-render the open widget when the page changes, so it reflects fresh state
 export function refreshDock() {
   if (currentWidget) renderWidget();
 }
