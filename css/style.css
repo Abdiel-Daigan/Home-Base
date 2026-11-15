@@ -421,3 +421,166 @@ body.sidebar-open .burger-btn {
   .dock { width: 90vw; }
   body.sidebar-open .burger-btn { left: calc(90vw - 60px); }
 }
+
+/* ============================================================
+   GAME LIBRARY FORM
+============================================================ */
+.cover-uploader {
+  width: 120px;
+  height: 68px;
+  border-radius: 14px;
+  border: 2px dashed var(--border);
+  background: #0b0d10;
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.15s;
+}
+.cover-uploader:hover { border-color: var(--accent); }
+.cover-uploader img { width: 100%; height: 100%; object-fit: cover; }
+.cover-placeholder {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 1.2rem;
+  line-height: 1.2;
+}
+
+.tag-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+.tag-chip {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 30px;
+  background: #0b0d10;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: 0.12s;
+}
+.tag-chip:hover { border-color: var(--accent-dim); color: var(--accent); }
+.tag-chip.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0d0f12;
+  font-weight: 600;
+}
+
+.game-library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.8rem;
+  margin-top: 0.6rem;
+}
+.game-lib-card {
+  position: relative;
+  background: #12161c;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.game-lib-card img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+}
+.game-lib-placeholder {
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  background: #0b0d10;
+}
+.game-lib-info { padding: 0.5rem 0.65rem; }
+.game-lib-info strong { font-size: 0.9rem; }
+.game-lib-info .small-text { margin-top: 0.15rem; }
+.game-lib-card > .danger {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 0.15rem 0.5rem;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(2px);
+}
+
+/* ============================================================
+   IMAGE EDITOR MODAL
+============================================================ */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(3px);
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.modal-backdrop.hidden { display: none; }
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 1.2rem 1.3rem;
+  width: min(460px, 100%);
+  max-height: 92vh;
+  overflow-y: auto;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+.modal-header h3 { color: var(--accent); font-size: 1.1rem; }
+
+.editor-stage {
+  position: relative;
+  margin: 0.8rem 0;
+  background: #0b0d10;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#editor-canvas {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  display: block;
+  touch-action: none;
+  cursor: grab;
+}
+#editor-canvas:active { cursor: grabbing; }
+
+.editor-hint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-style: italic;
+  pointer-events: none;
+}
+
+.editor-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.editor-controls input[type="range"] { flex: 1; }
