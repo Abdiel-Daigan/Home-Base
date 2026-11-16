@@ -7,8 +7,8 @@ export const defaultState = {
   assignments: [],
   todos: [],
   notes: [],
-  games: [],        // [{ name, tags: [], image: dataURL|null }]
-  playSessions: [],
+  games: [],        // [{ name, tags: [], image: dataURL|null, manualMinutes: 0 }]
+  playSessions: [], // [{ id, gameName, start, end, paused, pauseStart }]
   moodLog: [],
   checkins: [],
   journal: [],
