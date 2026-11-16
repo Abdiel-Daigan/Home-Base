@@ -239,7 +239,6 @@ export function drawEditor() {
   ctx.restore();
 }
 
-// BUG FIX: Removed the dataset check so listeners are cleanly attached every time
 export function wireEditorDrag() {
   const canvas = document.getElementById('editor-canvas');
   if (!canvas) return;
@@ -304,7 +303,39 @@ export function applyEditorImage() {
 ============================================================ */
 export function stopPlaying(sessionId) {
   const s = state.playSessions.find(s => s.id === sessionId);
-  if (s) { s.end = nowISO(); saveState(); }
+  if (s) { 
+    s.end = nowISO(); 
+    s.paused = false;
+    saveState(); 
+  }
+  render();
+}
+
+export function togglePause(sessionId) {
+  const s = state.playSessions.find(s => s.id === sessionId);
+  if (!s || s.end) return;
+
+  if (s.paused) {
+    // Resume: add paused duration to start time so total time continues correctly
+    if (s.pauseStart) {
+      const pauseDuration = Date.now() - new Date(s.pauseStart).getTime();
+      s.start = new Date(new Date(s.start).getTime() + pauseDuration).toISOString();
+    }
+    s.paused = false;
+    s.pauseStart = null;
+  } else {
+    // Pause
+    s.paused = true;
+    s.pauseStart = nowISO();
+  }
+  saveState();
+  render();
+}
+
+export function deleteSession(sessionId) {
+  if (!confirm('delete this play session?')) return;
+  state.playSessions = state.playSessions.filter(s => s.id !== sessionId);
+  saveState();
   render();
 }
 
@@ -346,6 +377,8 @@ window.updateEditorZoom = updateEditorZoom;
 window.resetEditorView = resetEditorView;
 window.applyEditorImage = applyEditorImage;
 window.stopPlaying = stopPlaying;
+window.togglePause = togglePause;
+window.deleteSession = deleteSession;
 window.editSessionEnd = editSessionEnd;
 window.addFinish = addFinish;
 window.removeFinish = removeFinish;
