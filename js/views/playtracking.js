@@ -65,19 +65,33 @@ export function renderPlayTracking(root) {
 
     <!-- ============ TOP DASHBOARD ============ -->
     <div class="grid-2" style="margin-bottom: 1.5rem;">
+      <!-- Recent Sessions (Horizontal Cards) -->
       <div class="card" style="margin-bottom: 0;">
         <h3 style="font-size:1rem; margin-bottom:0.6rem;">recent sessions</h3>
         ${recentSessions.length === 0 ? '<div class="empty-msg">no sessions yet</div>' :
-          recentSessions.map(s => `
-            <div class="history-item">
-              <strong>${escapeHTML(s.gameName)}</strong> — ${fmtDate(s.start)}
-              ${s.end
-                ? `→ ${Math.round((new Date(s.end) - new Date(s.start)) / 60000)}m
-                   <button class="small" onclick="editSessionEnd('${s.id}')">edit</button>`
-                : '· in progress'}
-            </div>
-          `).join('')}
+          `<div class="recent-sessions-list">
+            ${recentSessions.map(s => {
+              const lib = state.games.find(x => x.name === s.gameName);
+              const img = lib?.image ? `<img src="${lib.image}" alt="">` : `<div class="recent-thumb-placeholder">🎮</div>`;
+              const duration = s.end ? Math.round((new Date(s.end) - new Date(s.start)) / 60000) : 'in progress';
+              return `
+                <div class="recent-session-card">
+                  ${img}
+                  <div class="recent-session-info">
+                    <strong>${escapeHTML(s.gameName)}</strong>
+                    <div class="small-text">${fmtDate(s.start)}</div>
+                    <div class="small-text">${duration === 'in progress' ? duration : duration + 'm'}</div>
+                  </div>
+                  <div class="recent-session-actions">
+                    <button class="small danger" onclick="deleteSession('${s.id}')">✕</button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>`}
       </div>
+      
+      <!-- Backlog Progress -->
       <div class="card" style="margin-bottom: 0;">
         <h3 style="font-size:1rem; margin-bottom:0.6rem;">backlog progress</h3>
         <p class="small-text" style="margin-bottom:0.4rem;">games played this month</p>
@@ -85,6 +99,25 @@ export function renderPlayTracking(root) {
         <p class="small-text">out of ${state.games.length} in your library</p>
       </div>
     </div>
+
+    <!-- ============ NOW PLAYING (Full Width) ============ -->
+    ${active ? `
+      <div class="card" style="border-left:4px solid var(--accent); margin-bottom: 1.5rem;">
+        <div class="flex-between">
+          <div>
+            <h3 style="margin:0;">now playing: ${escapeHTML(active.gameName)}</h3>
+            ${active.paused ? '<span class="small-text deadline-yellow" style="display:block; margin-top:0.2rem;">⏸ paused</span>' : ''}
+          </div>
+          <div class="row" style="gap:0.5rem;">
+            <button class="primary" onclick="togglePause('${active.id}')">
+              ${active.paused ? 'resume' : 'pause'}
+            </button>
+            <button class="danger" onclick="stopPlaying('${active.id}')">stop playing</button>
+          </div>
+        </div>
+        <div class="timer-display" id="play-timer" style="text-align:left; font-size:3rem; margin-top:0.5rem;">--:--</div>
+      </div>
+    ` : ''}
 
     <!-- ============ LIBRARY HEADER ============ -->
     <div class="flex-between" style="margin-bottom:0.8rem;">
@@ -115,15 +148,6 @@ export function renderPlayTracking(root) {
             }).join('')}
           </div>`}
     </div>
-
-    <!-- ============ NOW PLAYING ============ -->
-    ${active ? `
-      <div class="card" style="border-left:4px solid var(--accent);">
-        <h3>now playing: ${escapeHTML(active.gameName)}</h3>
-        <div class="timer-display" id="play-timer">--:--</div>
-        <button class="primary" onclick="stopPlaying('${active.id}')">stop playing</button>
-      </div>
-    ` : ''}
 
     <!-- ============ FINISH IT LIST ============ -->
     <div class="card">
@@ -223,14 +247,29 @@ export function renderPlayTracking(root) {
   `;
 
   if (active) {
-    playTick = setInterval(() => {
+    const updateTimer = () => {
       const el = document.getElementById('play-timer');
       if (!el) return;
-      const secs = Math.floor((Date.now() - new Date(active.start)) / 1000);
-      const m = Math.floor(secs / 60);
-      const s = secs % 60;
-      el.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-    }, 1000);
+      
+      if (active.paused) {
+        // Time is frozen at the moment of pause
+        const secs = Math.floor((new Date(active.pauseStart) - new Date(active.start)) / 1000);
+        const m = Math.floor(secs / 60);
+        const s = secs % 60;
+        el.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+      } else {
+        // Live ticking
+        const secs = Math.floor((Date.now() - new Date(active.start)) / 1000);
+        const m = Math.floor(secs / 60);
+        const s = secs % 60;
+        el.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+      }
+    };
+    
+    updateTimer();
+    if (!active.paused) {
+      playTick = setInterval(updateTimer, 1000);
+    }
   }
 
   if (window._editorState?.image) {
