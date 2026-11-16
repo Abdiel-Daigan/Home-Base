@@ -4,6 +4,7 @@
 import { state } from '../core/storage.js';
 import { backButton, escapeHTML, fmtDate } from '../core/utils.js';
 import { TAG_OPTIONS } from '../core/constants.js';
+import { playGame } from '../actions/gameActions.js';
 import '../actions/playActions.js';
 
 let playTick = null;
@@ -50,6 +51,7 @@ export function renderPlayTracking(root) {
   if (playTick) clearInterval(playTick);
 
   const active = state.playSessions.find(s => !s.end);
+  const activeGame = active ? state.games.find(g => g.name === active.gameName) : null;
 
   const monthStart = new Date();
   monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
@@ -65,7 +67,6 @@ export function renderPlayTracking(root) {
 
     <!-- ============ TOP DASHBOARD ============ -->
     <div class="grid-2" style="margin-bottom: 1.5rem;">
-      <!-- Recent Sessions (Horizontal Cards) -->
       <div class="card" style="margin-bottom: 0;">
         <h3 style="font-size:1rem; margin-bottom:0.6rem;">recent sessions</h3>
         ${recentSessions.length === 0 ? '<div class="empty-msg">no sessions yet</div>' :
@@ -91,7 +92,6 @@ export function renderPlayTracking(root) {
           </div>`}
       </div>
       
-      <!-- Backlog Progress -->
       <div class="card" style="margin-bottom: 0;">
         <h3 style="font-size:1rem; margin-bottom:0.6rem;">backlog progress</h3>
         <p class="small-text" style="margin-bottom:0.4rem;">games played this month</p>
@@ -102,20 +102,26 @@ export function renderPlayTracking(root) {
 
     <!-- ============ NOW PLAYING (Full Width) ============ -->
     ${active ? `
-      <div class="card" style="border-left:4px solid var(--accent); margin-bottom: 1.5rem;">
-        <div class="flex-between">
-          <div>
-            <h3 style="margin:0;">now playing: ${escapeHTML(active.gameName)}</h3>
-            ${active.paused ? '<span class="small-text deadline-yellow" style="display:block; margin-top:0.2rem;">⏸ paused</span>' : ''}
+      <div class="card" style="border-left:4px solid var(--accent); margin-bottom: 1.5rem; display:flex; align-items:center; gap:1.2rem;">
+        ${activeGame?.image 
+          ? `<img src="${activeGame.image}" style="width:100px; height:56px; object-fit:cover; border-radius:12px; flex-shrink:0;">`
+          : `<div style="width:100px; height:56px; border-radius:12px; background:#0b0d10; display:flex; align-items:center; justify-content:center; font-size:1.5rem; flex-shrink:0;">🎮</div>`
+        }
+        <div style="flex:1;">
+          <div class="flex-between">
+            <div>
+              <h3 style="margin:0;">now playing: ${escapeHTML(active.gameName)}</h3>
+              ${active.paused ? '<span class="small-text deadline-yellow" style="display:block; margin-top:0.2rem;">⏸ paused</span>' : ''}
+            </div>
+            <div class="row" style="gap:0.5rem;">
+              <button class="primary" onclick="togglePause('${active.id}')">
+                ${active.paused ? 'resume' : 'pause'}
+              </button>
+              <button class="danger" onclick="stopPlaying('${active.id}')">stop playing</button>
+            </div>
           </div>
-          <div class="row" style="gap:0.5rem;">
-            <button class="primary" onclick="togglePause('${active.id}')">
-              ${active.paused ? 'resume' : 'pause'}
-            </button>
-            <button class="danger" onclick="stopPlaying('${active.id}')">stop playing</button>
-          </div>
+          <div class="timer-display" id="play-timer" style="text-align:left; font-size:2.5rem; margin-top:0.5rem;">--:--</div>
         </div>
-        <div class="timer-display" id="play-timer" style="text-align:left; font-size:3rem; margin-top:0.5rem;">--:--</div>
       </div>
     ` : ''}
 
@@ -143,6 +149,8 @@ export function renderPlayTracking(root) {
                     <div class="small-text">${fmtHM(total)} total</div>
                     ${recent > 0 ? `<div class="small-text deadline-green">${fmtHM(recent)} recent</div>` : ''}
                   </div>
+                  <!-- Hover Play Button -->
+                  <button class="play-hover-btn primary" onclick="event.stopPropagation(); playGame('${escapeHTML(g.name)}')">▶ Play</button>
                 </div>
               `;
             }).join('')}
@@ -252,13 +260,11 @@ export function renderPlayTracking(root) {
       if (!el) return;
       
       if (active.paused) {
-        // Time is frozen at the moment of pause
         const secs = Math.floor((new Date(active.pauseStart) - new Date(active.start)) / 1000);
         const m = Math.floor(secs / 60);
         const s = secs % 60;
         el.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
       } else {
-        // Live ticking
         const secs = Math.floor((Date.now() - new Date(active.start)) / 1000);
         const m = Math.floor(secs / 60);
         const s = secs % 60;
