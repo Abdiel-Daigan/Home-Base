@@ -317,9 +317,29 @@ body.sidebar-open .burger-btn {
   aspect-ratio: 16 / 9; display: flex; align-items: center; justify-content: center;
   font-size: 2rem; background: #0b0d10;
 }
-.game-lib-info { padding: 0.5rem 0.65rem; }
+.game-lib-info { padding: 0.5rem 0.65rem; padding-bottom: 2.2rem; }
 .game-lib-info strong { font-size: 0.9rem; }
 .game-lib-info .small-text { margin-top: 0.15rem; }
+
+/* Hover Play Button */
+.play-hover-btn {
+  position: absolute;
+  bottom: 0.6rem;
+  left: 0.65rem;
+  right: 0.65rem;
+  padding: 0.3rem 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  pointer-events: none;
+}
+.game-lib-card:hover .play-hover-btn {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
 
 .game-card-drawn { display: flex; align-items: center; gap: 0.8rem; }
 .game-card-drawn img {
